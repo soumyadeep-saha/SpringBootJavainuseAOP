@@ -1,0 +1,323 @@
+SpringBootJavainuseAOP
+
+AOP(Apsect Oriented Programming)
+During software development, functions that span multiple points of an application are called cross-cutting concerns. Hence ,separating these cross-cutting concerns from the business logic is where aspect-oriented programming (AOP) comes into picture.Using AOP, we define the common functionality in one place, but we can declaratively define how and where this functionality is applied without having to modify the class to which we are applying the new feature. Cross-cutting concerns can now be modularized into special classes called aspects. This has two benefits. First, the logic for each concern is now in one place, as opposed to being scattered all over the code base. Second, our business modules are now cleaner since they only contain code for their primary concern and secondary concerns have been moved to aspects.
+Aspects have responsibility they are meant to discharge. This responsibility of an aspect is called advice. An aspect's functionality is woven into a programmer's execution at one or more join points.
+PointCut are the regular expression of jointpoint.
+This has two benefits. First, the logic for each concern is now in one place, as opposed to being scattered all over the code base. Second, our business modules are now cleaner since they only contain code for their primary concern and secondary concerns have been moved to aspects.
+
+Before -> The advice functionality takes place before the advised method is invoked.
+After -> The advice functionality takes place after the advised method completes, regardless of the outcome.
+After Returning -> The advice functionality takes place after the advised method successfully completes.
+After Throwing -> The advice functionality takes place after the advised method throws an exception.
+Around -> The advice wraps the advised method, providing some functionality before and after the advised method is invoked.
+
+Add dependency
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-aop</artifactId>
+</dependency>
+
+Create aspect
+@Aspect
+@Component
+public class EmployeeServiceAspect {
+
+	@Before(value = "execution(* com.javainuse.service.EmployeeService.*(..)) and args(name,empId)") // pointcuts, the name should match the arguments names in the method of service class
+	public void beforeAdvice(JoinPoint joinPoint, String name, String empId) {
+		System.out.println("Before method:" + joinPoint.getSignature());
+
+		System.out.println("Creating Employee with name - " + name + " and id - " + empId);
+	}
+
+	@After(value = "execution(* com.javainuse.service.EmployeeService.*(..)) and args(name,empId)")
+	public void afterAdvice(JoinPoint joinPoint, String name, String empId) {
+		System.out.println("After method:" + joinPoint.getSignature());
+
+		System.out.println("Successfully created Employee with name - " + name + " and id - " + empId);
+	}
+}
+
+Create controller EmployeeController
+@Autowired
+	private EmployeeService employeeService;
+
+	@RequestMapping(value = "/add/employee", method = RequestMethod.GET)
+	public Employee addEmployee(@RequestParam("name") String name, @RequestParam("empId") String empId) {
+
+		return employeeService.createEmployee(name, empId);
+
+	}
+
+	@RequestMapping(value = "/remove/employee", method = RequestMethod.GET)
+	public String removeEmployee( @RequestParam("empId") String empId) {
+
+		employeeService.deleteEmployee(empId);
+
+		return "Employee removed";
+	}
+
+Create model Employee
+private String empId;
+private String name;
+
+Create service
+@Service
+public class EmployeeService {
+
+	public Employee createEmployee(String name, String empId) {
+
+		Employee emp = new Employee();
+		emp.setName(name);
+		emp.setEmpId(empId);
+		return emp;
+	}
+
+	public void deleteEmployee(String empId) {
+		
+	}
+}
+
+Create main class
+@SpringBootApplication
+@EnableAspectJAutoProxy(proxyTargetClass=true)
+public class SpringBootHelloWorldApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(SpringBootHelloWorldApplication.class, args);
+	}
+}
+
+Compile and the run the main aplication as a Java application.
+Go to http://localhost:8080/add/employee?empName=soumyadeep1&empId=1
+
+
+
+  
+
+ 
+
+
+ 
+Spring Boot + AOP Simple Example
+In this post we develop a Spring Boot Application with AOP(Apsect Oriented Programming). 
+
+What is AOP?
+
+During software development, functions that span multiple points of an application are called cross-cutting concerns. These cross-cutting concerns differ from the applicationâ€™s main business logic. Hence ,separating these cross-cutting concerns from the business logic is where aspect-oriented programming (AOP) comes into picture.
+Using AOP, we define the common functionality in one place, but we can declaratively define how and where this functionality is applied without having to modify the class to which we are applying the new feature. Cross-cutting concerns can now be modularized into special classes called aspects. This has two benefits. First, the logic for each concern is now in one place, as opposed to being scattered all over the code base. Second, our business modules are now cleaner since they only contain code for their primary concern and secondary concerns have been moved to aspects.
+Aspects have responsibility they are meant to discharge. This responsibility of an aspect is called advice. An aspect's functionality is woven into a programâ€™s execution at one or more join points
+In addition to describing the responsibility that an aspect will discharge, advice addresses the question of when to discharge this responsibility. Spring aspects can work with five kinds of advice:
+Before â€” The advice functionality takes place before the advised method is invoked.
+After â€” The advice functionality takes place after the advised method completes, regardless of the outcome.
+After - returningâ€”The advice functionality takes place after the advised method successfully completes.
+After - throwingâ€”The advice functionality takes place after the advised method throws an exception.
+Around â€” The advice wraps the advised method, providing some functionality before and after the advised method is invoked.
+
+In Spring, aspects are woven into Spring-managed beans at runtime by wrapping them with a proxy class. The proxy class poses as the target bean, intercepting advised method calls and forwarding those calls to the target bean. Between the time when the proxy intercepts the method call and the time when it invokes the target bean's method, the proxy performs the aspect logic.
+Video
+
+This tutorial is explained in the below Youtube Video.
+
+
+
+Lets Begin-
+
+The Spring Boot Application we will be creating is as follows-
+Maven Project will be as follows-
+
+ 
+
+In the Maven we need the spring boot test dependency.Maven will be as follows-
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.javainuse</groupId>
+	<artifactId>SpringBootAOPHelloWorld</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>SpringBootHelloWorld</name>
+	<description>Demo project for Spring Boot</description>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.4.1.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+
+ 
+Create the Employee model class as follows-
+package com.javainuse.model;
+
+public class Employee {
+	private String empId;
+	private String name;
+
+	public Employee() {
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getEmpId() {
+		return empId;
+	}
+
+	public void setEmpId(String empId) {
+		this.empId = empId;
+	}
+
+}
+
+
+
+@RequestMapping maps /employee request to return an employee object. method.
+package com.javainuse.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.javainuse.model.Employee;
+import com.javainuse.service.EmployeeService;
+
+@RestController
+public class EmployeeController {
+
+	@Autowired
+	private EmployeeService employeeService;
+
+	@RequestMapping(value = "/add/employee", method = RequestMethod.GET)
+	public Employee addEmployee(@RequestParam("name") String name, @RequestParam("empId") String empId) {
+
+		return employeeService.createEmployee(name, empId);
+
+	}
+
+	@RequestMapping(value = "/remove/employee", method = RequestMethod.GET)
+	public String removeEmployee( @RequestParam("empId") String empId) {
+
+		employeeService.deleteEmployee(empId);
+
+		return "Employee removed";
+	}
+
+}
+
+ 
+Create the service as follows-
+package com.javainuse.service;
+
+import org.springframework.stereotype.Service;
+
+import com.javainuse.model.Employee;
+
+@Service
+public class EmployeeService {
+
+	public Employee createEmployee(String name, String empId) {
+
+		Employee emp = new Employee();
+		emp.setName(name);
+		emp.setEmpId(empId);
+		return emp;
+	}
+
+	public void deleteEmployee(String empId) {
+		
+	}
+}
+Create the Aspect class that define the joinpoints and the pointcuts.
+package com.javainuse.aspect;
+
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component
+public class EmployeeServiceAspect {
+
+	@Before(value = "execution(* com.javainuse.service.EmployeeService.*(..)) and args(name,empId)")
+	public void beforeAdvice(JoinPoint joinPoint, String name, String empId) {
+		System.out.println("Before method:" + joinPoint.getSignature());
+
+		System.out.println("Creating Employee with name - " + name + " and id - " + empId);
+	}
+
+	@After(value = "execution(* com.javainuse.service.EmployeeService.*(..)) and args(name,empId)")
+	public void afterAdvice(JoinPoint joinPoint, String name, String empId) {
+		System.out.println("After method:" + joinPoint.getSignature());
+
+		System.out.println("Successfully created Employee with name - " + name + " and id - " + empId);
+	}
+}
+
+Create the SpringBootHelloWorldApplication.java as below-
+package com.javainuse;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+
+@SpringBootApplication
+@EnableAspectJAutoProxy(proxyTargetClass=true)
+public class SpringBootHelloWorldApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(SpringBootHelloWorldApplication.class, args);
+	}
+}
+
+ 
+Compile and the run the SpringBootHelloWorldApplication.java as a Java application.
+Go to localhost:8080/add/employee
+We will see in the console that the advice has been applied.
+Download Source Code
+Download it -
+Spring Boot + AOP
